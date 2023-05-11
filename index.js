@@ -131,7 +131,7 @@ function uncache(module = '.') {
     
  	haruka.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect, qr} = update	    
-        if (qr){
+        /*if (qr){
           app.use(async (req, res) => {
         res.setHeader('content-type', 'image/png')
         res.end(await toBuffer(qr))
@@ -140,7 +140,7 @@ app.use(express.static(path.join(__dirname, 'views')))
   server.listen(PORT, () => {
         console.log('App listened on port', PORT)
   })
-        }
+        }*/
         if (connection === 'close') {
         let reason = new Boom(lastDisconnect?.error)?.output.statusCode
             if (reason === DisconnectReason.badSession) { console.log(`Bad Session File, Please Delete Session and Scan Again`); haruka.logout(); }
@@ -601,6 +601,52 @@ return buffer
         }
         haruka.sendMessage(jid, buttonMessage, { quoted, ...options })
     }
+haruka.send1ButMes = (jid, text = '', footer = '', butId = '', dispText = '', quoted, ments) => {
+      let but = [{
+         buttonId: butId,
+         buttonText: {
+            displayText: dispText
+         },
+         type: 1
+      }]
+      let butMes = {
+         text: text,
+         buttons: but,
+         footer: footer,
+         mentions: ments ? ments : []
+      }
+      haruka.sendMessage(jid, butMes, {
+         quoted: quoted
+      })
+   }
+
+  haruka.send2ButMes = (jid, text = '', footer = '', butId = '', dispText = '', butId2 = '', dispText2 = '', quoted, ments) => {
+      let but2 = [{
+            buttonId: butId,
+            buttonText: {
+               displayText: dispText
+            },
+            type: 1
+         },
+         {
+            buttonId: butId2,
+            buttonText: {
+               displayText: dispText2
+            },
+            type: 1
+         }
+      ]
+      let butMes2 = {
+         text: text,
+         buttons: but2,
+         footer: footer,
+         mentions: ments ? ments : []
+      }
+      haruka.sendMessage(jid, butMes2, {
+         quoted: quoted
+      })
+   }
+
 	haruka.sendText = (jid, text, quoted = '', options) => haruka.sendMessage(jid, { text: text, ...options }, { quoted, ...options })
 
     haruka.cMod = (jid, copy, text = '', sender = haruka.user.id, options = {}) => {
@@ -668,4 +714,3 @@ fs.watchFile(file, () => {
 	delete require.cache[file]
 	require(file)
 })
-require("http").createServer((_, res) => res.end("OKTA!")).listen(8080)
